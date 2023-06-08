@@ -23,6 +23,7 @@ let maxScore = 0;
 /*********************************************** */
 /*** FUNCTIONS ********************************* */
 /*********************************************** */
+
 function toggleFlag(cell, e) {
     e.preventDefault();
 
@@ -62,6 +63,7 @@ function cellClick() {
     /**
      * Handles the gameover procedure
      * @param {node} thisCell the clicked cell
+     * @param {boolean} win normally false, if true triggers behaveiours of player victory
      */
     const gameOver = (thisCell, win = false) => {
 
@@ -91,7 +93,18 @@ function cellClick() {
         }
     }
 
+    /**
+     * get the number of nearby mines when a cell is clicked
+     * @param {node} cell the cell that wants to count the nearby mines
+     * @param {array} mines nearby
+     */
     const getNearbyMines = (cell, mines) => {
+
+        /**
+         * it returns the valid neighbours of a cell, if a cell is on the edge of the field
+         * @param {node} cell the cell which we want to know the valid neighbours
+         * @returns {array} an array containing the valid neighbour nodes
+         */
         const getValidNeighbours = cell => {
             const x = parseInt(cell.dataset.x);
             const y = parseInt(cell.dataset.y);
@@ -237,12 +250,14 @@ function startGame() {
     /**
     * Generates 16 mines at random positions, and return an array containing the positions
     * BOMBS ARE STORED IN AN ARRAY AS POSITIONS AND NOT IN THE HTML TO PREVENT USER FROM CHEATING :D
-    * @param {number} max the number of cells, mines should not be placed in non existing cells
+    * @param {number} numeberOfCells the number of cells, mines should not be placed in non existing cells
+    * @param {number} numberOfMines the total number of mines to generate
     * @returns {[array]}
     */
     const generateMines = (numberOfCells, numberOfMines) => {
 
         const getRndNumber = max => Math.floor(Math.random() * max);
+
         const mines = [];
         const max = Math.sqrt(numberOfCells);
 
