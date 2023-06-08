@@ -29,9 +29,7 @@ function cellClick() {
      * @param {array} minesArray the array containing all the mines positions
      * @returns {boolean} wheter the cell is included or not
      */
-    const isMine = (cell, minesArray) => {
-        const x = parseInt(cell.dataset.x);
-        const y = parseInt(cell.dataset.y);
+    const isMine = (x, y, minesArray) => {
         let isMine = false;
 
         for (let mine of minesArray) {
@@ -60,16 +58,36 @@ function cellClick() {
         for (let cell of cells) {
             // removes the even listener to prevent user to click more cells after game over
             cell.removeEventListener('click', cellClick);
+            const x = parseInt(cell.dataset.x);
+            const y = parseInt(cell.dataset.y);
 
             // renders the mines on the field after the game over
-            if (isMine(cell, mines)) {
+            if (isMine(x, y, mines)) {
                 cell.innerHTML = mineImage;
                 cell.classList.add('clicked');
             }
         }
     }
 
-    if (isMine(this, mines)) {
+    const getNearbyMines = (x, y, mines) => {
+        let nearbyMines = 0;
+
+        if (isMine(x - 1, y - 1, mines)) nearbyMines++;
+        if (isMine(x - 1, y, mines)) nearbyMines++;
+        if (isMine(x - 1, y + 1, mines)) nearbyMines++;
+        if (isMine(x, y + 1, mines)) nearbyMines++;
+        if (isMine(x + 1, y + 1, mines)) nearbyMines++;
+        if (isMine(x + 1, y, mines)) nearbyMines++;
+        if (isMine(x + 1, y - 1, mines)) nearbyMines++;
+        if (isMine(x, y - 1, mines)) nearbyMines++;
+
+        return nearbyMines;
+    }
+
+    const x = parseInt(this.dataset.x);
+    const y = parseInt(this.dataset.y);
+
+    if (isMine(x, y, mines)) {
         gameOver(this);
         return;
     }
@@ -79,6 +97,12 @@ function cellClick() {
         currentScore++;
         currentScoreOutput.innerText = currentScore;
     }
+
+
+    const nearbyMines = getNearbyMines(x, y, mines);
+
+    if (nearbyMines) this.innerText = nearbyMines;
+
     this.classList.add('clicked');
 }
 
@@ -150,9 +174,9 @@ function startGame() {
     */
     const generateMines = (numberOfCells, numberOfMines) => {
 
-        const getRndNumber = max => Math.floor(Math.random() * max) + 1;
+        const getRndNumber = max => Math.floor(Math.random() * max);
         const mines = [];
-        const max = Math.sqrt(numberOfCells) - 1;
+        const max = Math.sqrt(numberOfCells);
 
         while (mines.length < numberOfMines) {
             const mineX = getRndNumber(max);
@@ -188,6 +212,8 @@ function startGame() {
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
+
+    console.log(mines);
 }
 
 /*********************************************** */
