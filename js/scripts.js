@@ -91,6 +91,7 @@ function startGame() {
         }
     }
 
+
     /**
     * Creates and renders the minefield, given the element where to print them and the number of cells to print
     * @param {node} field the place where the nodes will be placed
@@ -98,27 +99,42 @@ function startGame() {
     * @param {string} difficulty the difficulty leve, it is used to give the field a class to render cells size based on how many there are
     */
     const renderField = (field, numberOfCells, difficulty) => {
+
+
+
         /**
          * Create a new cell element. The required number is the position where the cell will be placed in the field
          * @param {number} position the position in the field where the cell wil be located, it is needed to derminate if it will contain the bomb
          * @returns {Node}
          *  */
-        const createCell = position => {
+        const createCell = (x, y) => {
             const cell = document.createElement('div');
             cell.className = 'cell';
-            cell.dataset.position = position;
+            cell.dataset.x = x;
+            cell.dataset.y = y;
             return cell;
+        }
+
+        const rows = Math.sqrt(numberOfCells);
+        const cols = rows;
+        let matrix = [];
+
+        for (let i = 0; i < rows; i++) {
+            matrix[i] = []
+            for (let j = 0; j < cols; j++) {
+                const cell = createCell(i, j);
+                field.appendChild(cell)
+
+                matrix[i][j] = cell;
+
+                cell.addEventListener('click', cellClick);
+            }
         }
 
         //class assegnation decides how big the cells are
         field.className = difficulty;
 
-        for (let i = 1; i <= numberOfCells; i++) {
-            const cell = createCell(i);
-            field.appendChild(cell);
-
-            cell.addEventListener('click', cellClick);
-        }
+        return matrix;
     }
 
     /**
@@ -146,23 +162,6 @@ function startGame() {
         return mines;
     }
 
-    const createMatrix = (cells, numberOfCells) => {
-        const rows = Math.sqrt(numberOfCells);
-        const cols = rows;
-        let matrix = [];
-        let index = 0;
-
-        for (let i = 0; i < rows; i++) {
-            matrix[i] = []
-            for (let j = 0; j < cols; j++) {
-                matrix[i][j] = cells[index];
-                index++;
-            }
-        }
-
-        return matrix;
-    }
-
     // FIELD RESET
     field.innerHTML = '';
     currentScoreOutput.innerText = currentScore = 0;
@@ -175,7 +174,7 @@ function startGame() {
     const numberOfCells = getNumberOfCells(difficulty);
 
     // renders the field
-    renderField(field, numberOfCells, difficulty);
+    cellsMatrix = renderField(field, numberOfCells, difficulty);
 
     // randomly generates 10 mines
     mines = generateMines(numberOfCells);
@@ -184,8 +183,6 @@ function startGame() {
     cells = field.getElementsByClassName('cell');
 
     // creates the matrix
-    cellsMatrix = createMatrix(cells, numberOfCells);
-
     console.log(cellsMatrix);
 }
 
