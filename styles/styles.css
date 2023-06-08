@@ -108,7 +108,17 @@ header>* {
 
     display: flex;
     justify-content: center;
-    flex-wrap: wrap
+    flex-wrap: wrap;
+}
+
+#win-text {
+    font-family: serif;
+    font-weight: bolder;
+    font-size: 60px;
+}
+
+#win-text.hidden {
+    display: none;
 }
 
 .cell {

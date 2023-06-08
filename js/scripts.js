@@ -5,6 +5,7 @@ const highScoreOutput = document.getElementById('high-score');
 const currentScoreOutput = document.getElementById('current-score');
 const playButton = document.getElementById('play-button');
 const smile = playButton.querySelector('img')
+const winText = document.getElementById('win-text');
 
 const numberOfMines = 16;
 const mineImage = `<img src="img/mine.png" alt="mine">`;
@@ -17,30 +18,32 @@ let cells = [];
 let mines = [];
 let currentScore = 0;
 let highScore = 0;
+let maxScore = 0;
 
 /*********************************************** */
 /*** FUNCTIONS ********************************* */
 /*********************************************** */
 
-/**
- * Checks if a given cell is a mine based on its position in the field and the array the mines position
- * @param {number} cell the position of the cell
- * @param {array} minesArray the array containing all the mines positions
- * @returns {boolean} wheter the cell is included or not
- */
-const isMine = (cell, minesArray) => {
-    const x = parseInt(cell.dataset.x);
-    const y = parseInt(cell.dataset.y);
-    let isMine = false;
-
-    for (let mine of minesArray) {
-        if (mine[0] === x && mine[1] === y) isMine = true;
-    }
-
-    return isMine;
-}
 
 function cellClick() {
+
+    /**
+     * Checks if a given cell is a mine based on its position in the field and the array the mines position
+     * @param {number} cell the position of the cell
+     * @param {array} minesArray the array containing all the mines positions
+     * @returns {boolean} wheter the cell is included or not
+     */
+    const isMine = (cell, minesArray) => {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        let isMine = false;
+
+        for (let mine of minesArray) {
+            if (mine[0] === x && mine[1] === y) isMine = true;
+        }
+
+        return isMine;
+    }
 
     /**
      * Handles the gameover procedure
@@ -134,6 +137,7 @@ function cellClick() {
             for (let neighbour of validNeighbours) {
                 if (!neighbour.classList.contains('clicked')) {
                     neighbour.classList.add('clicked');
+                    currentScoreOutput.innerText = ++currentScore;
                     getNearbyMines(neighbour, mines);
                 }
             }
@@ -148,13 +152,16 @@ function cellClick() {
 
     // checks if the current cell was already clicked, and only if it WASN'T, it increments the score
     if (!this.classList.contains('clicked')) {
-        currentScore++;
-        currentScoreOutput.innerText = currentScore;
+        currentScoreOutput.innerText = ++currentScore;
     }
 
     getNearbyMines(this, mines);
 
     this.classList.add('clicked');
+
+    if (currentScore === maxScore) {
+        winText.classList.remove('hidden');
+    }
 }
 
 function startGame() {
@@ -211,7 +218,15 @@ function startGame() {
 
                 cell.addEventListener('contextmenu', (e) => {
                     e.preventDefault();
-                    cell.innerHTML = flagImage;
+                    if (!cell.classList.contains('clicked')) {
+                        if (cell.hasAttribute('data-flag')) {
+                            cell.innerHTML = ''
+                            cell.removeAttribute('data-flag');
+                        } else {
+                            cell.innerHTML = flagImage;
+                            cell.setAttribute('data-flag', '');
+                        }
+                    }
                 })
             }
         }
@@ -253,12 +268,14 @@ function startGame() {
     field.innerHTML = '';
     currentScoreOutput.innerText = currentScore = 0;
     smile.src = smilePlay;
+    winText.classList.add('hidden');
 
     // there is no need to validate difficulty input, the program can handles different values from expected ones and it will default to a medium difficulty
     const difficulty = difficultyInput.value;
 
     // from difficulty calculates the number of cell to render
     const numberOfCells = getNumberOfCells(difficulty);
+    maxScore = numberOfCells - numberOfMines;
 
     // renders the field
     cellsMatrix = renderField(field, numberOfCells, difficulty);
