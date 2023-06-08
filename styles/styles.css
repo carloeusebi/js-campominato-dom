@@ -1,0 +1,147 @@
+/* css reset */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+:root {
+    --background: #c0c0c0;
+    --shadow-side: #808080;
+    --light-side: #ffffff;
+}
+
+img {
+    padding: 5px;
+    max-width: 100%;
+}
+
+body {
+    padding-top: 20px;
+    background-image: url(../img/windows-background.jpg);
+    background-size: cover;
+
+    user-select: none;
+}
+
+main {
+    background-color: var(--background);
+    width: 710px;
+    margin: 0 auto;
+    padding: 10px;
+    border: 5px solid #555
+}
+
+header {
+    height: 150px;
+    margin: 20px;
+    padding: 10px;
+    border-top: 20px solid var(--shadow-side);
+    border-right: 20px solid var(--light-side);
+    border-bottom: 20px solid var(--light-side);
+    border-left: 20px solid var(--shadow-side);
+
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header>* {
+    width: calc(100% / 3);
+    display: flex;
+    justify-content: center;
+}
+
+#play-button {
+    width: 70px;
+    height: 70px;
+    background-color: var(--background);
+    border-top: 5px solid var(--light-side);
+    border-right: 5px solid var(--shadow-side);
+    border-bottom: 5px solid var(--shadow-side);
+    border-left: 5px solid var(--light-side);
+    cursor: pointer;
+}
+
+#play-button:active {
+    border-top: 5px solid var(--shadow-side);
+    border-right: 5px solid var(--light-side);
+    border-bottom: 5px solid var(--light-side);
+    border-left: 5px solid var(--shadow-side);
+}
+
+#play-button:active img {
+    translate: 2px 2px;
+}
+
+#difficulty {
+    border: 0;
+    outline: 0;
+    background-color: var(--background);
+}
+
+.score {
+    width: 150px;
+    height: 70px;
+
+    border-top: 5px solid var(--shadow-side);
+    border-right: 5px solid var(--light-side);
+    border-bottom: 5px solid var(--light-side);
+    border-left: 5px solid var(--shadow-side);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 60px;
+    font-family: 'orbitron';
+
+    background-color: black;
+    color: red;
+}
+
+#matrix {
+    height: 640px;
+    margin: 20px;
+    border-top: 20px solid var(--shadow-side);
+    border-right: 20px solid var(--light-side);
+    border-bottom: 20px solid var(--light-side);
+    border-left: 20px solid var(--shadow-side);
+
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap
+}
+
+.cells {
+    border-top: 5px solid var(--light-side);
+    border-right: 5px solid var(--shadow-side);
+    border-bottom: 5px solid var(--shadow-side);
+    border-left: 5px solid var(--light-side);
+    position: relative;
+    cursor: pointer;
+}
+
+#matrix.easy>* {
+    width: calc(100% / 10);
+    height: calc(100% / 10);
+}
+
+#matrix.medium>* {
+    width: calc(100% / 9);
+    height: calc(100% / 9);
+}
+
+#matrix.hard>* {
+    width: calc(100% / 7);
+    height: calc(100% / 7);
+}
+
+.cells.clicked,
+.cells.bomb,
+.cells.exploded {
+    border: 1px solid var(--shadow-side);
+}
+
+.cells.exploded {
+    background-color: red;
+}

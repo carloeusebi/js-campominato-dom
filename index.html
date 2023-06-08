@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Carlo Eusebi">
+    <title>Minesweeper</title>
+    <link rel="icon" href="img/mine.png" type="icon/png">
+    <!-- font awesome -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css'
+        integrity='sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=='
+        crossorigin='anonymous'>
+    <!-- styles.css -->
+    <link rel="stylesheet" href="styles/styles.css" type="text/css">
+    <!-- javascript -->
+    <script defer src="js/scripts.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Orbitron:regular,500,600,700,800,900" rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Exercise made by
+    CARLO EUSEBI -->
+
+    <main>
+
+        <select id="difficulty">
+            <option value="easy">Easy</option>
+            <option value="medium" selected>Medium</option>
+            <option value="hard">Hard</option>
+        </select>
+
+        <header>
+
+            <div id="high-score" class="score">0</div>
+
+            <div>
+                <button id="play-button">
+                    <img src="img/smile.png" alt="play button">
+                </button>
+            </div>
+
+
+            <div id="current-score" class="score">0</div>
+
+
+
+        </header>
+        <section id="matrix">
+        </section>
+    </main>
+
+</body>
+
+</html>
