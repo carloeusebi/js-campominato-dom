@@ -21,24 +21,26 @@ let highScore = 0;
 /*** FUNCTIONS ********************************* */
 /*********************************************** */
 
+/**
+ * Checks if a given cell is a mine based on its position in the field and the array the mines position
+ * @param {number} cell the position of the cell
+ * @param {array} minesArray the array containing all the mines positions
+ * @returns {boolean} wheter the cell is included or not
+ */
+const isMine = (cell, minesArray) => {
+    const x = parseInt(cell.dataset.x);
+    const y = parseInt(cell.dataset.y);
+    let isMine = false;
+
+    for (let mine of minesArray) {
+        if (mine[0] === x && mine[1] === y) isMine = true;
+    }
+
+    return isMine;
+}
 
 function cellClick() {
 
-    /**
-     * Checks if a given cell is a mine based on its position in the field and the array the mines position
-     * @param {number} cell the position of the cell
-     * @param {array} minesArray the array containing all the mines positions
-     * @returns {boolean} wheter the cell is included or not
-     */
-    const isMine = (x, y, minesArray) => {
-        let isMine = false;
-
-        for (let mine of minesArray) {
-            if (mine[0] === x && mine[1] === y) isMine = true;
-        }
-
-        return isMine;
-    }
 
     /**
      * Handles the gameover procedure
@@ -59,47 +61,87 @@ function cellClick() {
         for (let cell of cells) {
             // removes the even listener to prevent user to click more cells after game over
             cell.removeEventListener('click', cellClick);
-            const x = parseInt(cell.dataset.x);
-            const y = parseInt(cell.dataset.y);
 
             // renders the mines on the field after the game over
-            if (isMine(x, y, mines)) {
+            if (isMine(cell, mines)) {
                 cell.innerHTML = mineImage;
                 cell.classList.add('clicked');
             }
         }
     }
 
-    const getNearbyMines = (x, y, mines) => {
+    const getNearbyMines = (cell, mines) => {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
         let nearbyMines = 0;
 
-        if (isMine(x - 1, y - 1, mines)) nearbyMines++;
-        if (isMine(x - 1, y, mines)) nearbyMines++;
-        if (isMine(x - 1, y + 1, mines)) nearbyMines++;
-        if (isMine(x, y + 1, mines)) nearbyMines++;
-        if (isMine(x + 1, y + 1, mines)) nearbyMines++;
-        if (isMine(x + 1, y, mines)) nearbyMines++;
-        if (isMine(x + 1, y - 1, mines)) nearbyMines++;
-        if (isMine(x, y - 1, mines)) nearbyMines++;
+        let topLeft;
+        let top;
+        let topRight;
+        let right;
+        let bottomRight;
+        let bottom;
+        let bottomLeft;
+        let left;
 
-        if (!nearbyMines) {
-            cellsMatrix[x - 1][y - 1].classList.add('clicked');
-            cellsMatrix[x - 1][y].classList.add('clicked');
-            cellsMatrix[x - 1][y + 1].classList.add('clicked');
-            cellsMatrix[x][y + 1].classList.add('clicked');
-            cellsMatrix[x + 1][y + 1].classList.add('clicked');
-            cellsMatrix[x + 1][y].classList.add('clicked');
-            cellsMatrix[x + 1][y - 1].classList.add('clicked');
-            cellsMatrix[x][y - 1].classList.add('clicked');
+        let validNeighbours = [];
+
+        if (x > 0) {
+            top = cellsMatrix[x - 1][y];
+            validNeighbours.push(top);
+
+            if (y > 0) {
+                topLeft = cellsMatrix[x - 1][y - 1];
+                validNeighbours.push(top);
+            }
+            if (y < cellsMatrix[0].length - 1) {
+
+                topRight = cellsMatrix[x - 1][y + 1];
+                validNeighbours.push(topRight);
+            }
         }
 
-        return nearbyMines;
+        if (x < cellsMatrix[0].length - 1) {
+            if (y < cellsMatrix[0].length - 1) {
+                bottomRight = cellsMatrix[x + 1][y + 1];
+                validNeighbours.push(bottomRight);
+            }
+            bottom = cellsMatrix[x + 1][y];
+            validNeighbours.push(bottom);
+            if (y > 0) {
+                bottomLeft = cellsMatrix[x + 1][y - 1];
+                validNeighbours.push(bottomLeft);
+            }
+        }
+
+        if (y > 0) {
+            left = cellsMatrix[x][y - 1];
+            validNeighbours.push(left);
+        }
+        if (y < cellsMatrix[0].length - 1) {
+            right = cellsMatrix[x][y + 1];
+            validNeighbours.push(right);
+        }
+
+        for (let neighbour of validNeighbours) {
+            if (isMine(neighbour, mines)) nearbyMines++;
+        }
+
+        console.log(validNeighbours);
+        if (nearbyMines) {
+            cell.innerText = nearbyMines;
+        } else {
+            for (let neighbour of validNeighbours) {
+                if (!neighbour.classList.contains('clicked')) {
+                    neighbour.classList.add('clicked');
+                    getNearbyMines(neighbour, mines);
+                }
+            }
+        }
+
     }
 
-    const x = parseInt(this.dataset.x);
-    const y = parseInt(this.dataset.y);
-
-    if (isMine(x, y, mines)) {
+    if (isMine(this, mines)) {
         gameOver(this);
         return;
     }
@@ -110,9 +152,7 @@ function cellClick() {
         currentScoreOutput.innerText = currentScore;
     }
 
-    const nearbyMines = getNearbyMines(x, y, mines);
-
-    if (nearbyMines) this.innerText = nearbyMines;
+    getNearbyMines(this, mines);
 
     this.classList.add('clicked');
 }
@@ -223,8 +263,6 @@ function startGame() {
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
-
-    console.log(mines);
 }
 
 /*********************************************** */
