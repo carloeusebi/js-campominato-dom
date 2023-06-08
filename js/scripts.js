@@ -6,10 +6,12 @@ const currentScoreOutput = document.getElementById('current-score');
 const playButton = document.getElementById('play-button');
 const smile = playButton.querySelector('img')
 
+const numberOfMines = 16;
 const mineImage = `<img src="img/mine.png" alt="mine">`;
 const smilePlay = 'img/smile.png';
 const smileOver = 'img/gameover.png';
 
+let cellsMatrix = [];
 let cells = [];
 let mines = [];
 let currentScore = 0;
@@ -20,11 +22,6 @@ let highScore = 0;
 /*********************************************** */
 
 
-
-
-/**
- * Handles what happens when a cell is clicked
- */
 function cellClick() {
     /**
      * Checks if a given cell is a mine based on its position in the field and the array the mines position
@@ -125,7 +122,7 @@ function startGame() {
     }
 
     /**
-    * Generates 10 mines at random positions, and return an array containing the positions
+    * Generates 16 mines at random positions, and return an array containing the positions
     * BOMBS ARE STORED IN AN ARRAY AS POSITIONS AND NOT IN THE HTML TO PREVENT USER FROM CHEATING :D
     * @param {number} max the number of cells, mines should not be placed in non existing cells
     * @returns {[array]}
@@ -140,13 +137,30 @@ function startGame() {
 
         const mines = [];
 
-        while (mines.length < 10) {
+        while (mines.length < numberOfMines) {
             const mine = getRndNumber(max);
             // to prevent generating to mines in the same cell we check that the new mine position is not included in the list of positions
             if (!mines.includes(mine)) mines.push(mine);
 
         }
         return mines;
+    }
+
+    const createMatrix = (cells, numberOfCells) => {
+        const rows = Math.sqrt(numberOfCells);
+        const cols = rows;
+        let matrix = [];
+        let index = 0;
+
+        for (let i = 0; i < rows; i++) {
+            matrix[i] = []
+            for (let j = 0; j < cols; j++) {
+                matrix[i][j] = cells[index];
+                index++;
+            }
+        }
+
+        return matrix;
     }
 
     // FIELD RESET
@@ -168,6 +182,11 @@ function startGame() {
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
+
+    // creates the matrix
+    cellsMatrix = createMatrix(cells, numberOfCells);
+
+    console.log(cellsMatrix);
 }
 
 /*********************************************** */
