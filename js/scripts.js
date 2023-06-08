@@ -92,7 +92,7 @@ function cellClick() {
 
             if (y > 0) {
                 topLeft = cellsMatrix[x - 1][y - 1];
-                validNeighbours.push(top);
+                validNeighbours.push(topLeft);
             }
             if (y < cellsMatrix[0].length - 1) {
 
