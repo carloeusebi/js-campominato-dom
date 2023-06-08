@@ -5,7 +5,7 @@ const highScoreOutput = document.getElementById('high-score');
 const currentScoreOutput = document.getElementById('current-score');
 const playButton = document.getElementById('play-button');
 const smile = playButton.querySelector('img')
-const winText = document.getElementById('win-text');
+let winText;
 
 const numberOfMines = 16;
 const mineImage = `<img src="img/mine.png" alt="mine">`;
@@ -130,14 +130,13 @@ function cellClick() {
             if (isMine(neighbour, mines)) nearbyMines++;
         }
 
-        console.log(validNeighbours);
         if (nearbyMines) {
             cell.innerText = nearbyMines;
         } else {
             for (let neighbour of validNeighbours) {
                 if (!neighbour.classList.contains('clicked')) {
                     neighbour.classList.add('clicked');
-                    currentScoreOutput.innerText = ++currentScore;
+                    currentScore++;
                     getNearbyMines(neighbour, mines);
                 }
             }
@@ -152,16 +151,21 @@ function cellClick() {
 
     // checks if the current cell was already clicked, and only if it WASN'T, it increments the score
     if (!this.classList.contains('clicked')) {
-        currentScoreOutput.innerText = ++currentScore;
+        currentScore++;
+        currentScoreOutput.innerText = currentScore;
     }
 
     getNearbyMines(this, mines);
 
+    if (currentScore >= maxScore) {
+        winText.classList.remove('hidden');
+        for (let cell of cells) {
+            cell.removeEventListener('click', cellClick);
+        }
+    }
+
     this.classList.add('clicked');
 
-    if (currentScore === maxScore) {
-        winText.classList.remove('hidden');
-    }
 }
 
 function startGame() {
@@ -265,10 +269,10 @@ function startGame() {
     }
 
     // FIELD RESET
-    field.innerHTML = '';
+    field.innerHTML = `<p id="win-text" class="hidden">YOU WIN!!</p>`;
     currentScoreOutput.innerText = currentScore = 0;
     smile.src = smilePlay;
-    winText.classList.add('hidden');
+    winText = document.getElementById('win-text');
 
     // there is no need to validate difficulty input, the program can handles different values from expected ones and it will default to a medium difficulty
     const difficulty = difficultyInput.value;
@@ -285,6 +289,8 @@ function startGame() {
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
+
+    console.log(maxScore);
 }
 
 /*********************************************** */
@@ -295,6 +301,3 @@ function startGame() {
 playButton.addEventListener('click', startGame);
 
 difficultyInput.addEventListener('change', startGame);
-
-
-

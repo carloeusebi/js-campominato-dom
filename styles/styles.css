@@ -115,6 +115,8 @@ header>* {
     font-family: serif;
     font-weight: bolder;
     font-size: 60px;
+    position: absolute;
+    z-index: 1;
 }
 
 #win-text.hidden {
