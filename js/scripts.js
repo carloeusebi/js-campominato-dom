@@ -23,6 +23,7 @@ let highScore = 0;
 
 
 function cellClick() {
+
     /**
      * Checks if a given cell is a mine based on its position in the field and the array the mines position
      * @param {number} cell the position of the cell
@@ -81,6 +82,17 @@ function cellClick() {
         if (isMine(x + 1, y - 1, mines)) nearbyMines++;
         if (isMine(x, y - 1, mines)) nearbyMines++;
 
+        if (!nearbyMines) {
+            cellsMatrix[x - 1][y - 1].classList.add('clicked');
+            cellsMatrix[x - 1][y].classList.add('clicked');
+            cellsMatrix[x - 1][y + 1].classList.add('clicked');
+            cellsMatrix[x][y + 1].classList.add('clicked');
+            cellsMatrix[x + 1][y + 1].classList.add('clicked');
+            cellsMatrix[x + 1][y].classList.add('clicked');
+            cellsMatrix[x + 1][y - 1].classList.add('clicked');
+            cellsMatrix[x][y - 1].classList.add('clicked');
+        }
+
         return nearbyMines;
     }
 
@@ -97,7 +109,6 @@ function cellClick() {
         currentScore++;
         currentScoreOutput.innerText = currentScore;
     }
-
 
     const nearbyMines = getNearbyMines(x, y, mines);
 
