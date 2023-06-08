@@ -29,7 +29,17 @@ function cellClick() {
      * @param {array} minesArray the array containing all the mines positions
      * @returns {boolean} wheter the cell is included or not
      */
-    const isMine = (cell, minesArray) => minesArray.includes(cell);
+    const isMine = (cell, minesArray) => {
+        const x = parseInt(cell.dataset.x);
+        const y = parseInt(cell.dataset.y);
+        let isMine = false;
+
+        for (let mine of minesArray) {
+            if (mine[0] === x && mine[1] === y) isMine = true;
+        }
+
+        return isMine;
+    }
 
     /**
      * Handles the gameover procedure
@@ -50,18 +60,16 @@ function cellClick() {
         for (let cell of cells) {
             // removes the even listener to prevent user to click more cells after game over
             cell.removeEventListener('click', cellClick);
-            const position = parseInt(cell.dataset.position);
 
             // renders the mines on the field after the game over
-            if (isMine(position, mines)) {
+            if (isMine(cell, mines)) {
                 cell.innerHTML = mineImage;
                 cell.classList.add('clicked');
             }
         }
     }
 
-    const position = parseInt(this.dataset.position);
-    if (isMine(position, mines)) {
+    if (isMine(this, mines)) {
         gameOver(this);
         return;
     }
@@ -91,7 +99,6 @@ function startGame() {
         }
     }
 
-
     /**
     * Creates and renders the minefield, given the element where to print them and the number of cells to print
     * @param {node} field the place where the nodes will be placed
@@ -99,8 +106,6 @@ function startGame() {
     * @param {string} difficulty the difficulty leve, it is used to give the field a class to render cells size based on how many there are
     */
     const renderField = (field, numberOfCells, difficulty) => {
-
-
 
         /**
          * Create a new cell element. The required number is the position where the cell will be placed in the field
@@ -143,22 +148,24 @@ function startGame() {
     * @param {number} max the number of cells, mines should not be placed in non existing cells
     * @returns {[array]}
     */
-    const generateMines = max => {
-        /**
-     * Return a random number given the max number
-     * @param {number} max the maximus value of the random number, ti should be the number of cells
-     * @returns {number}
-     */
-        const getRndNumber = max => Math.floor(Math.random() * max) + 1;
+    const generateMines = (numberOfCells, numberOfMines) => {
 
+        const getRndNumber = max => Math.floor(Math.random() * max) + 1;
         const mines = [];
+        const max = Math.sqrt(numberOfCells) - 1;
 
         while (mines.length < numberOfMines) {
-            const mine = getRndNumber(max);
-            // to prevent generating to mines in the same cell we check that the new mine position is not included in the list of positions
-            if (!mines.includes(mine)) mines.push(mine);
+            const mineX = getRndNumber(max);
+            const mineY = getRndNumber(max);
+            let isNewMine = true;
 
+            for (let mine of mines) {
+                if (mine[0] === mineX && mine[1] === mineY) isNewMine = false;
+            }
+
+            if (isNewMine) mines.push([mineX, mineY]);
         }
+
         return mines;
     }
 
@@ -177,13 +184,10 @@ function startGame() {
     cellsMatrix = renderField(field, numberOfCells, difficulty);
 
     // randomly generates 10 mines
-    mines = generateMines(numberOfCells);
+    mines = generateMines(numberOfCells, numberOfMines);
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
-
-    // creates the matrix
-    console.log(cellsMatrix);
 }
 
 /*********************************************** */
@@ -194,3 +198,6 @@ function startGame() {
 playButton.addEventListener('click', startGame);
 
 difficultyInput.addEventListener('change', startGame);
+
+
+
