@@ -23,6 +23,20 @@ let maxScore = 0;
 /*********************************************** */
 /*** FUNCTIONS ********************************* */
 /*********************************************** */
+function toggleFlag(cell, e) {
+    e.preventDefault();
+
+    if (!cell.classList.contains('clicked')) {
+
+        if (cell.hasAttribute('data-flag')) {
+            cell.innerHTML = ''
+            cell.removeAttribute('data-flag');
+        } else {
+            cell.innerHTML = flagImage;
+            cell.setAttribute('data-flag', '');
+        }
+    }
+}
 
 
 function cellClick() {
@@ -49,11 +63,15 @@ function cellClick() {
      * Handles the gameover procedure
      * @param {node} thisCell the clicked cell
      */
-    const gameOver = thisCell => {
-        thisCell.classList.add('exploded');
+    const gameOver = (thisCell, win = false) => {
+
+        if (win) winText.classList.remove('hidden');
+        else {
+            thisCell.classList.add('exploded');
+            smile.src = smileOver;
+        }
 
         // replaces the smile button with a game over smile x_x
-        smile.src = smileOver;
 
         // checks if the current game score is new high score
         if (currentScore > highScore) {
@@ -74,61 +92,50 @@ function cellClick() {
     }
 
     const getNearbyMines = (cell, mines) => {
-        const x = parseInt(cell.dataset.x);
-        const y = parseInt(cell.dataset.y);
+        const getValidNeighbours = cell => {
+            const x = parseInt(cell.dataset.x);
+            const y = parseInt(cell.dataset.y);
+            let validNeighbours = [];
+
+            if (x > 0) {
+                validNeighbours.push(cellsMatrix[x - 1][y]);
+
+                if (y > 0) {
+                    validNeighbours.push(cellsMatrix[x - 1][y - 1]);
+                }
+                if (y < cellsMatrix[0].length - 1) {
+                    validNeighbours.push(cellsMatrix[x - 1][y + 1]);
+                }
+            }
+
+            if (x < cellsMatrix[0].length - 1) {
+                if (y < cellsMatrix[0].length - 1) {
+                    validNeighbours.push(cellsMatrix[x + 1][y + 1]);
+                }
+                validNeighbours.push(cellsMatrix[x + 1][y]);
+                if (y > 0) {
+                    validNeighbours.push(cellsMatrix[x + 1][y - 1]);
+                }
+            }
+
+            if (y > 0) {
+                validNeighbours.push(cellsMatrix[x][y - 1]);
+            }
+            if (y < cellsMatrix[0].length - 1) {
+                validNeighbours.push(cellsMatrix[x][y + 1]);
+            }
+
+            return validNeighbours;
+        }
+
+        const validNeighbours = getValidNeighbours(cell);
+
         let nearbyMines = 0;
-
-        let topLeft;
-        let top;
-        let topRight;
-        let right;
-        let bottomRight;
-        let bottom;
-        let bottomLeft;
-        let left;
-
-        let validNeighbours = [];
-
-        if (x > 0) {
-            top = cellsMatrix[x - 1][y];
-            validNeighbours.push(top);
-
-            if (y > 0) {
-                topLeft = cellsMatrix[x - 1][y - 1];
-                validNeighbours.push(topLeft);
-            }
-            if (y < cellsMatrix[0].length - 1) {
-
-                topRight = cellsMatrix[x - 1][y + 1];
-                validNeighbours.push(topRight);
-            }
-        }
-
-        if (x < cellsMatrix[0].length - 1) {
-            if (y < cellsMatrix[0].length - 1) {
-                bottomRight = cellsMatrix[x + 1][y + 1];
-                validNeighbours.push(bottomRight);
-            }
-            bottom = cellsMatrix[x + 1][y];
-            validNeighbours.push(bottom);
-            if (y > 0) {
-                bottomLeft = cellsMatrix[x + 1][y - 1];
-                validNeighbours.push(bottomLeft);
-            }
-        }
-
-        if (y > 0) {
-            left = cellsMatrix[x][y - 1];
-            validNeighbours.push(left);
-        }
-        if (y < cellsMatrix[0].length - 1) {
-            right = cellsMatrix[x][y + 1];
-            validNeighbours.push(right);
-        }
 
         for (let neighbour of validNeighbours) {
             if (isMine(neighbour, mines)) nearbyMines++;
         }
+
 
         if (nearbyMines) {
             cell.innerText = nearbyMines;
@@ -136,11 +143,11 @@ function cellClick() {
             for (let neighbour of validNeighbours) {
                 if (!neighbour.classList.contains('clicked')) {
                     neighbour.classList.add('clicked');
-                    currentScore++;
                     getNearbyMines(neighbour, mines);
                 }
             }
         }
+        currentScore++;
 
     }
 
@@ -149,22 +156,18 @@ function cellClick() {
         return;
     }
 
-    // checks if the current cell was already clicked, and only if it WASN'T, it increments the score
     if (!this.classList.contains('clicked')) {
-        currentScore++;
+        this.classList.add('clicked');
+        getNearbyMines(this, mines);
         currentScoreOutput.innerText = currentScore;
     }
 
-    getNearbyMines(this, mines);
-
     if (currentScore >= maxScore) {
-        winText.classList.remove('hidden');
-        for (let cell of cells) {
-            cell.removeEventListener('click', cellClick);
-        }
+        console.log(currentScore, maxScore);
+        const win = true;
+        gameOver(this, win);
     }
 
-    this.classList.add('clicked');
 
 }
 
@@ -192,7 +195,6 @@ function startGame() {
     * @param {string} difficulty the difficulty leve, it is used to give the field a class to render cells size based on how many there are
     */
     const renderField = (field, numberOfCells, difficulty) => {
-
         /**
          * Create a new cell element. The required number is the position where the cell will be placed in the field
          * @param {number} position the position in the field where the cell wil be located, it is needed to derminate if it will contain the bomb
@@ -220,17 +222,8 @@ function startGame() {
 
                 cell.addEventListener('click', cellClick);
 
-                cell.addEventListener('contextmenu', (e) => {
-                    e.preventDefault();
-                    if (!cell.classList.contains('clicked')) {
-                        if (cell.hasAttribute('data-flag')) {
-                            cell.innerHTML = ''
-                            cell.removeAttribute('data-flag');
-                        } else {
-                            cell.innerHTML = flagImage;
-                            cell.setAttribute('data-flag', '');
-                        }
-                    }
+                cell.addEventListener('contextmenu', function (e) {
+                    toggleFlag(this, e);
                 })
             }
         }
@@ -269,7 +262,7 @@ function startGame() {
     }
 
     // FIELD RESET
-    field.innerHTML = `<p id="win-text" class="hidden">YOU WIN!!</p>`;
+    field.innerHTML = ``;
     currentScoreOutput.innerText = currentScore = 0;
     smile.src = smilePlay;
     winText = document.getElementById('win-text');
@@ -289,8 +282,6 @@ function startGame() {
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
-
-    console.log(maxScore);
 }
 
 /*********************************************** */
@@ -301,3 +292,4 @@ function startGame() {
 playButton.addEventListener('click', startGame);
 
 difficultyInput.addEventListener('change', startGame);
+

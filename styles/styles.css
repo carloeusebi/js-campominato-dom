@@ -116,7 +116,9 @@ header>* {
     font-weight: bolder;
     font-size: 60px;
     position: absolute;
-    z-index: 1;
+    left: 50%;
+    top: 185px;
+    transform: translateX(-50%);
 }
 
 #win-text.hidden {
