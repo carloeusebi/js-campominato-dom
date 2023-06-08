@@ -99,7 +99,7 @@ header>* {
     color: red;
 }
 
-#matrix {
+#field {
     height: 640px;
     margin: 20px;
     border-top: 20px solid var(--shadow-side);
@@ -112,7 +112,7 @@ header>* {
     flex-wrap: wrap
 }
 
-.cells {
+.cell {
     border-top: 5px solid var(--light-side);
     border-right: 5px solid var(--shadow-side);
     border-bottom: 5px solid var(--shadow-side);
@@ -121,27 +121,28 @@ header>* {
     cursor: pointer;
 }
 
-#matrix.easy>* {
-    width: calc(100% / 10);
-    height: calc(100% / 10);
-}
-
-#matrix.medium>* {
+#field>.cell {
     width: calc(100% / 9);
     height: calc(100% / 9);
 }
 
-#matrix.hard>* {
+#field.easy>.cell {
+    width: calc(100% / 10);
+    height: calc(100% / 10);
+}
+
+
+#field.hard>.cell {
     width: calc(100% / 7);
     height: calc(100% / 7);
 }
 
-.cells.clicked,
-.cells.bomb,
-.cells.exploded {
+.cell.clicked,
+.cell.bomb,
+.cell.exploded {
     border: 1px solid var(--shadow-side);
 }
 
-.cells.exploded {
+.cell.exploded {
     background-color: red;
 }
