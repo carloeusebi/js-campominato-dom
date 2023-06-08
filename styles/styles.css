@@ -126,6 +126,11 @@ header>* {
     font-size: 35px;
 }
 
+.flag {
+    width: 85%;
+    height: 85%;
+}
+
 #field>.cell {
     width: calc(100% / 9);
     height: calc(100% / 9);

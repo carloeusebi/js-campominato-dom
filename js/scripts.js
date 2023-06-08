@@ -8,6 +8,7 @@ const smile = playButton.querySelector('img')
 
 const numberOfMines = 16;
 const mineImage = `<img src="img/mine.png" alt="mine">`;
+const flagImage = `<img src="img/flag.png" class="flag" alt="flag">`;
 const smilePlay = 'img/smile.png';
 const smileOver = 'img/gameover.png';
 
@@ -40,7 +41,6 @@ const isMine = (cell, minesArray) => {
 }
 
 function cellClick() {
-
 
     /**
      * Handles the gameover procedure
@@ -208,6 +208,11 @@ function startGame() {
                 matrix[i][j] = cell;
 
                 cell.addEventListener('click', cellClick);
+
+                cell.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    cell.innerHTML = flagImage;
+                })
             }
         }
 
