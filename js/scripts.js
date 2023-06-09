@@ -13,12 +13,14 @@ const flagImage = `<img src="img/flag.png" class="flag" alt="flag">`;
 const smilePlay = 'img/smile.png';
 const smileOver = 'img/gameover.png';
 
+let numberOfCells;
 let cellsMatrix = [];
 let cells = [];
 let mines = [];
 let currentScore = 0;
 let highScore = 0;
 let maxScore = 0;
+let firstMove;
 
 /*********************************************** */
 /*** FUNCTIONS ********************************* */
@@ -41,6 +43,35 @@ function toggleFlag(cell, e) {
 
 
 function cellClick() {
+
+    /**
+* Generates 16 mines at random positions, and return an array containing the positions
+* @param {number} numeberOfCells the number of cells, mines should not be placed in non existing cells
+* @param {number} numberOfMines the total number of mines to generate
+* @returns {[array]}
+*/
+    const generateMines = (numberOfCells, numberOfMines, firstCell) => {
+
+        const getRndNumber = max => Math.floor(Math.random() * max);
+        const isNotNewMine = (x, y, mine) => mine[0] === x && mine[1] === y;
+        const isNotFirstCell = (x, y, cell) => parseInt(cell.dataset.x) !== x && parseInt(cell.dataset.y) !== y;
+
+        const newMines = [];
+        const max = Math.sqrt(numberOfCells);
+
+        while (newMines.length < numberOfMines) {
+            const mineX = getRndNumber(max);
+            const mineY = getRndNumber(max);
+            let isNew = true;
+
+            for (let mine of newMines) {
+                if (isNotNewMine(mineX, mineY, mine)) isNew = false;
+            }
+            if (isNew && isNotFirstCell(mineX, mineY, firstCell)) newMines.push([mineX, mineY]);
+        }
+        return newMines;
+    }
+
 
     /**
      * Checks if a given cell is a mine based on its position in the field and the array the mines position
@@ -192,6 +223,11 @@ function cellClick() {
 
     }
 
+    if (firstMove) {
+        mines = generateMines(numberOfCells, numberOfMines, this);
+        firstMove = false;
+    }
+
     if (isMine(this, mines)) {
         gameOver(this);
         return;
@@ -204,7 +240,6 @@ function cellClick() {
     }
 
     if (currentScore >= maxScore) {
-        console.log(currentScore, maxScore);
         const win = true;
         gameOver(this, win);
     }
@@ -275,53 +310,24 @@ function startGame() {
         return matrix;
     }
 
-    /**
-    * Generates 16 mines at random positions, and return an array containing the positions
-    * BOMBS ARE STORED IN AN ARRAY AS POSITIONS AND NOT IN THE HTML TO PREVENT USER FROM CHEATING :D
-    * @param {number} numeberOfCells the number of cells, mines should not be placed in non existing cells
-    * @param {number} numberOfMines the total number of mines to generate
-    * @returns {[array]}
-    */
-    const generateMines = (numberOfCells, numberOfMines) => {
-
-        const getRndNumber = max => Math.floor(Math.random() * max);
-
-        const mines = [];
-        const max = Math.sqrt(numberOfCells);
-
-        while (mines.length < numberOfMines) {
-            const mineX = getRndNumber(max);
-            const mineY = getRndNumber(max);
-            let isNewMine = true;
-
-            for (let mine of mines) {
-                if (mine[0] === mineX && mine[1] === mineY) isNewMine = false;
-            }
-
-            if (isNewMine) mines.push([mineX, mineY]);
-        }
-
-        return mines;
-    }
-
     // FIELD RESET
     field.innerHTML = ``;
     currentScoreOutput.innerText = currentScore = 0;
     smile.src = smilePlay;
     winText.classList.add('hidden');
+    firstMove = true;
 
     // there is no need to validate difficulty input, the program can handles different values from expected ones and it will default to a medium difficulty
     const difficulty = difficultyInput.value;
 
     // from difficulty calculates the number of cell to render
-    const numberOfCells = getNumberOfCells(difficulty);
+    numberOfCells = getNumberOfCells(difficulty);
     maxScore = numberOfCells - numberOfMines;
 
     // renders the field
     cellsMatrix = renderField(field, numberOfCells, difficulty);
 
-    // randomly generates 10 mines
-    mines = generateMines(numberOfCells, numberOfMines);
+
 
     // grab all the cells in an array, it will be used after game over to remove event listeners and to show all the mines on screen
     cells = field.getElementsByClassName('cell');
