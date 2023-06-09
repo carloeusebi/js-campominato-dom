@@ -5,7 +5,7 @@ const highScoreOutput = document.getElementById('high-score');
 const currentScoreOutput = document.getElementById('current-score');
 const playButton = document.getElementById('play-button');
 const smile = playButton.querySelector('img')
-let winText;
+const winText = document.getElementById('win-text');
 
 const numberOfMines = 16;
 const mineImage = `<img src="img/mine.png" alt="mine">`;
@@ -141,6 +141,32 @@ function cellClick() {
             return validNeighbours;
         }
 
+        /**
+         * Given the number of nearby mines it return the css class name to color the number
+         * @param {number} number the number of nearby mines
+         * @returns {string} the nameo of the css class to color the cell
+         */
+        const getColor = number => {
+            switch (number) {
+                case 1:
+                    return 'blue';
+                case 2:
+                    return 'green';
+                case 3:
+                    return 'red';
+                case 4:
+                    return 'darkblue';
+                case 5:
+                    return 'darkred';
+                case 6:
+                    return 'aqua';
+                case 7:
+                    return 'black';
+                case 8:
+                    return 'gray';
+            }
+        }
+
         const validNeighbours = getValidNeighbours(cell);
 
         let nearbyMines = 0;
@@ -152,6 +178,8 @@ function cellClick() {
 
         if (nearbyMines) {
             cell.innerText = nearbyMines;
+            const color = getColor(nearbyMines);
+            cell.classList.add(color);
         } else {
             for (let neighbour of validNeighbours) {
                 if (!neighbour.classList.contains('clicked')) {
@@ -280,7 +308,7 @@ function startGame() {
     field.innerHTML = ``;
     currentScoreOutput.innerText = currentScore = 0;
     smile.src = smilePlay;
-    winText = document.getElementById('win-text');
+    winText.classList.add('hidden');
 
     // there is no need to validate difficulty input, the program can handles different values from expected ones and it will default to a medium difficulty
     const difficulty = difficultyInput.value;

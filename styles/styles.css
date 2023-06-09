@@ -170,3 +170,35 @@ header>* {
 .cell.exploded {
     background-color: red;
 }
+
+.cell.blue {
+    color: blue;
+}
+
+.cell.green {
+    color: green;
+}
+
+.cell.red {
+    color: red;
+}
+
+.cell.darkblue {
+    color: #01007f;
+}
+
+.cell.darkred {
+    color: #7f0102;
+}
+
+.cell.aqua {
+    color: #047f7e;
+}
+
+.cell.black {
+    color: black;
+}
+
+.cell.gray {
+    color: gray;
+}
